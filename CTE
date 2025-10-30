@@ -48,6 +48,16 @@ select * from orders;
  select r.restaurant_name, r.city, r.total_revenue, r.total_orders, c.city_avg from resturent_data r 
  left join city_revenue c on r.city=c.city where r.total_revenue >c.city_avg;
  
- 
+ --Management wants to identify repeat customers who spent more than 1000, broken down by city.
+with customer_info as (
+select c.customer_id, c.city, c.customer_name, sum(o.total_amount) as total_spent from customers c 
+left join orders o on o.customer_id=c.customer_id group by c.customer_id, c.customer_name, c.city
+),
+city_info as(
+select ci.city, avg(ci.total_spent) as avgg from customer_info ci group by ci.city
+
+)
+select c.customer_name, ci.city from customers c join city_info ci on c.city=ci.city where ci.avgg >1000;
+
  
  
